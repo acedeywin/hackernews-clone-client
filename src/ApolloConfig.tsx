@@ -3,9 +3,9 @@ import { createHttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from "apollo-link-context";
 import { AUTH_TOKEN } from "./constants";
-import { split } from "apollo-link";
-import { WebSocketLink } from "apollo-link-ws";
-import { getMainDefinition } from "apollo-utilities";
+// import { split } from "apollo-link";
+// import { WebSocketLink } from "apollo-link-ws";
+// import { getMainDefinition } from "apollo-utilities";
 
 const httpLink = createHttpLink({
   uri: "https://serene-beach-26832.herokuapp.com/",
@@ -21,27 +21,27 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-const wsLink = new WebSocketLink({
-  uri: `ws://serene-beach-26832.herokuapp.com/`,
-  options: {
-    reconnect: true,
-    connectionParams: {
-      authToken: localStorage.getItem(AUTH_TOKEN),
-    },
-  },
-});
+// const wsLink = new WebSocketLink({
+//   uri: `ws://serene-beach-26832.herokuapp.com/`,
+//   options: {
+//     reconnect: true,
+//     connectionParams: {
+//       authToken: localStorage.getItem(AUTH_TOKEN),
+//     },
+//   },
+// });
 
-const link = split(
-  ({ query }) => {
-    const { kind, operation }: any = getMainDefinition(query);
-    return kind === "OperationDefinition" && operation === "subscription";
-  },
-  wsLink,
-  authLink.concat(httpLink)
-);
+// const link = split(
+//   ({ query }) => {
+//     const { kind, operation }: any = getMainDefinition(query);
+//     return kind === "OperationDefinition" && operation === "subscription";
+//   },
+//   wsLink,
+//   authLink.concat(httpLink)
+// );
 
 export const client = new ApolloClient({
-  link,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
   defaultOptions: {
     mutate: { errorPolicy: "ignore" },
